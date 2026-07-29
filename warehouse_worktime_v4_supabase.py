@@ -17,50 +17,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Role-based access control settings
-ROLE_LABELS = {
-    "admin": "系統管理員",
-    "manager": "主管",
-    "operator": "作業人員",
-    "viewer": "查詢人員",
-}
-
-ROLE_PAGES = {
-    "admin": [
-        "首頁 Dashboard",
-        "今日工時登錄",
-        "工時明細查詢",
-        "作業單據查詢",
-        "工時日報表",
-        "工時月報表",
-        "圖表分析",
-        "帳號與權限",
-    ],
-    "manager": [
-        "首頁 Dashboard",
-        "今日工時登錄",
-        "工時明細查詢",
-        "作業單據查詢",
-        "工時日報表",
-        "工時月報表",
-        "圖表分析",
-    ],
-    "operator": [
-        "首頁 Dashboard",
-        "今日工時登錄",
-        "我的工時明細",
-        "作業單據查詢",
-    ],
-    "viewer": [
-        "首頁 Dashboard",
-        "工時明細查詢",
-        "作業單據查詢",
-        "工時日報表",
-        "工時月報表",
-        "圖表分析",
-    ],
-}
-
 def database_url() -> str:
     """Read the PostgreSQL URL from Streamlit Secrets or an environment variable."""
     try:
@@ -395,13 +351,13 @@ if user.get("must_change_password"):
                 st.error(message)
     st.stop()
 
-allowed_pages = ROLE_PAGES.get(user.get("role"), ROLE_PAGES["viewer"])
+allowed_pages = ROLE_PAGES[user["role"]]
 
 with st.sidebar:
     st.markdown("## 🔴 UPRtek")
     st.markdown("### 倉庫工時管理系統")
     st.markdown(f"**{user['display_name']}**")
-    st.markdown(f'<span class="role-badge">{ROLE_LABELS.get(user.get("role"), "未知角色")}</span>', unsafe_allow_html=True)
+    st.markdown(f'<span class="role-badge">{ROLE_LABELS[user["role"]]}</span>', unsafe_allow_html=True)
     page = st.radio("功能", allowed_pages, label_visibility="collapsed")
     st.divider()
     if st.button("🔑 變更密碼", use_container_width=True):
@@ -436,7 +392,7 @@ if st.session_state.get("show_password_dialog"):
                     st.error(message)
 
 st.title("倉庫工時管理系統 企業版 V4.0")
-st.caption(f"登入者：{user['display_name']}｜權限：{ROLE_LABELS.get(user.get('role'), '未知角色')}")
+st.caption(f"登入者：{user['display_name']}｜權限：{ROLE_LABELS[user['role']]}")
 
 raw = fetch_logs()
 if not raw.empty:
